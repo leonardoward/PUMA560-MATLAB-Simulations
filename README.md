@@ -49,7 +49,7 @@ UNIMATE/puma560
 
 ## PUMA 560
 
-![Alt Text](gif_puma_560_3d/puma_560_3d_vel20.gif "PUMA 560 3D")
+![Alt Text](gif_puma_560_3d/puma_560_3d_vel20_2.gif "PUMA 560 3D")
 
 ## Authors
 

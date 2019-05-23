@@ -22,7 +22,7 @@ function varargout = puma560_gui(varargin)
 
 % Edit the above text to modify the response to help puma560_gui
 
-% Last Modified by GUIDE v2.5 18-May-2019 01:02:33
+% Last Modified by GUIDE v2.5 23-May-2019 10:30:24
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -279,10 +279,17 @@ q_trj
 disp(['Jacobian Matrix Ranks : ', mat2str(rank_trj)])
 disp(['Jacobian Matrix Determinats : ', mat2str(det_trj)])
 
-p560.plot3d(q_trj, 'movie', 'images');
-% p560.plot3d(q_trj);
-%p560.plot(q_trj, 'movie', 'images');
+if(get(handles.btn_3d,'Value'))
+    
+    % p560.plot3d(q_trj)
+    p560.plot3d(q_trj, 'movie', 'images');
 
+else
+    %p560.plot(q_trj);
+    p560.plot(q_trj, 'movie', 'images');
+
+end
+    
 % Store the old joint values
 handles.q_old = q;
 
@@ -317,6 +324,7 @@ handles.Roll_X.String = num2str(fix(Roll_X));
 handles.Pitch_Y.String = num2str(fix(Pitch_Y));
 handles.Yaw_Z.String = num2str(fix(Yaw_Z));
 handles.jacobian_ranks.String = sprintf('Jacobian Ranks (Trajectory):  %s',mat2str(rank_trj)) ;
+%handles.message.String = sprintf('Forward Kinematics -> %s', mat2str(q*180/pi));
 
 
 
@@ -528,11 +536,12 @@ q_trj
 disp(['Jacobian Matrix Ranks : ', mat2str(rank_trj)])
 disp(['Jacobian Matrix Determinats : ', mat2str(det_trj)])
 
-
-p560.plot3d(q_trj, 'movie', 'images')
-%p560.plot(q_trj);
-%p560.plot(q_trj, 'movie', 'images');
-
+if(get(handles.btn_3d, 'Value'))
+    p560.plot3d(q_trj, 'movie', 'images')
+else
+    %p560.plot(q_trj);
+    p560.plot(q_trj, 'movie', 'images');
+end
 % Store the old joint values
 handles.q_old = q;
 
@@ -541,6 +550,8 @@ guidata(hObject, handles);
 
 q = q*180/pi;
 
+disp([])
+
 handles.Theta_1.String = num2str(fix(q(1)));
 handles.Theta_2.String = num2str(fix(q(2)));
 handles.Theta_3.String = num2str(fix(q(3)));
@@ -548,6 +559,7 @@ handles.Theta_4.String = num2str(fix(q(4)));
 handles.Theta_5.String = num2str(fix(q(5)));
 handles.Theta_6.String = num2str(fix(q(6)));
 handles.jacobian_ranks.String = sprintf('Jacobian Ranks (Trajectory):  %s',mat2str(rank_trj)) ;
+%handles.message.String = sprintf('Inverse Kinematics -> Pos : $s, Orientation : %s', mat2str([PX, PY, PZ]), mat2str([Roll_X, Pitch_Y, Yaw_Z]));
 
 
 
@@ -686,3 +698,12 @@ function tor_z_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in btn_3d.
+function btn_3d_Callback(hObject, eventdata, handles)
+% hObject    handle to btn_3d (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of btn_3d
