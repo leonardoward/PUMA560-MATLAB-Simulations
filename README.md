@@ -1,56 +1,101 @@
-# PUMA560-MATLAB-Simulations
+# PUMA560 MATLAB Simulations
 
-PUMA560 Simulations using Perter Corke's Robotics Toolbox for MATLAB.
+Two MATLAB GUIs for exploring serial‑robot kinematics with
+[Peter Corke's Robotics Toolbox](https://petercorke.com/toolboxes/robotics-toolbox/):
+one for a teaching **RRR** arm (3 revolute joints) and one for the classic
+**Unimation PUMA 560** (6 joints), the latter animated with the real STL link
+meshes from the [ARTE](https://arvc.umh.es/arte/index_en.html) library.
 
-## Getting Started
+<p align="center">
+  <img src="gif_puma_560_3d/puma_560_3d_vel20_2.gif" alt="PUMA 560 3D animation">
+</p>
 
-To get a copy of this project you can use git, and clone the repository:
+## Table of Contents
 
-```
-git clone https://github.com/leonardoward/PUMA560-MATLAB-Simulations.git
-```
+1. [What the GUIs Do](#what-the-guis-do)
+2. [Prerequisites](#prerequisites)
+3. [Installing](#installing)
+4. [RRR Robot](#rrr-robot)
+5. [PUMA 560](#puma-560)
+6. [Repository Layout](#repository-layout)
+7. [Author](#author)
 
-Or you can download the zip file with the project and extract it to get the files.
+## What the GUIs Do
 
-### Prerequisites
+### `puma560_gui`
 
-1-MATLAB (Developed using MATLAB R2015b)
+The PUMA 560 GUI (`puma560_gui.m` / `.fig`, built with GUIDE) does a full
+forward / inverse kinematics round trip and shows the intermediate robotics maths:
 
-2-[Peter Corke's Robotics Toolbox](http://petercorke.com/wordpress/toolboxes/robotics-toolbox)
+* **Forward kinematics** &mdash; type the six joint angles (degrees). The GUI builds a
+  smooth joint‑space trajectory from the previous pose with `jtraj` (10 steps), and for
+  every step it computes the **manipulator Jacobian** (`p560.jacobe`), its
+  **determinant** and its **rank** &mdash; so configurations near a **singularity** show up
+  as a rank drop / determinant collapse. It then animates the trajectory and reads the
+  end‑effector pose back out of the forward‑kinematics transform (`p560.fkine`),
+  reporting X/Y/Z and roll/pitch/yaw (`tr2rpy`).
+* **Statics** &mdash; an optional force/torque vector `[fx fy fz tx ty tz]` applied at the
+  end effector is mapped to the joint torques that would hold it, using the
+  Jacobian transpose (`q_add = J' * force`), and folded into the displayed trajectory.
+* **Inverse kinematics** &mdash; type a target Cartesian pose; the GUI solves for the
+  joint angles with `p560.ikine`, then animates the `jtraj` path to it.
+* **2D or 3D** &mdash; a toggle switches between the fast wire‑frame plot (`p560.plot`)
+  and the textured STL model (`p560.plot3d`); frames are written out to `images/` to
+  build the GIFs in this repo.
 
-3-[ARTE Library](http://arvc.umh.es/arte/index_en.html): This library contains the needed STL models for the PUMA560.
+### `RRR_Robot_GUI`
 
-### Installing
+A stripped‑down version for a 3‑revolute (RRR) arm &mdash; the same forward/inverse
+kinematics idea on a robot simple enough to check the maths by hand. The link lengths
+are defined directly with `Link([theta d a alpha])` / `SerialLink`.
 
-1-[Peter Corke's Robotics Toolbox](http://petercorke.com/wordpress/toolboxes/robotics-toolbox)
+## Prerequisites
 
-- Download the mltbx file, this project was developed using [RTB-10.3.1](http://petercorke.com/wordpress/?ddownload=574).
-- From within the MATLAB file browser double click on this file (mltbx), it will install and configure the paths correctly.
+1. **MATLAB** (developed on R2015b).
+2. **[Peter Corke's Robotics Toolbox](https://petercorke.com/toolboxes/robotics-toolbox/)**
+   &mdash; developed with [RTB&nbsp;10.3.1](http://petercorke.com/wordpress/?ddownload=574).
+3. **[ARTE Library](https://arvc.umh.es/arte/index_en.html)** &mdash; provides the STL link
+   meshes for the PUMA 560's 3D view (a copy of the `UNIMATE/` folder is included here).
 
-2-[ARTE Library](http://arvc.umh.es/arte/index_en.html)
+## Installing
 
-- Download the [zip file with the ARTE Library](http://arvc.umh.es/arte/arte.zip).
-- Copy the folder /path/to/arte/arte/robots/UNIMATE/, this folder contains the STL models. A copy of this folder can be found on the root path of this repository.
-- Paste the folder with the STL models in the path /path/to/MATLAB/version/toolbox/phased/phased/data/ARTE/,
-in this case the version is R2015b.
+**Robotics Toolbox** &mdash; download the `.mltbx` and double‑click it in the MATLAB file
+browser; it installs and sets the paths.
 
-To check that is installed correctly run in the MATLAB terminal:
+**ARTE STL models** &mdash; copy `arte/robots/UNIMATE/` (or the `UNIMATE/` folder from this
+repo) into
+`.../MATLAB/<version>/toolbox/phased/phased/data/ARTE/`. Check it with:
 
 ```matlab
-> mdl_puma560
-> p560.model3d
+>> mdl_puma560
+>> p560.model3d
 ans =
 UNIMATE/puma560
 ```
 
+Then run `puma560_gui` or `RRR_Robot_GUI` from the MATLAB prompt.
+
 ## RRR Robot
 
-![Alt Text](gif_robot_gui/robot4.gif "RRR Robot")
+![RRR Robot](gif_robot_gui/robot4.gif)
 
 ## PUMA 560
 
-![Alt Text](gif_puma_560_3d/puma_560_3d_vel20_2.gif "PUMA 560 3D")
+![PUMA 560 3D](gif_puma_560_3d/puma_560_3d_vel20_2.gif)
 
-## Authors
+## Repository Layout
 
-* **Leonardo Ward** -  [Github](https://github.com/leonardoward)
+```
+puma560_gui.m / .fig            PUMA 560 kinematics GUI (GUIDE)
+RRR_Robot_GUI.m / .fig          RRR arm kinematics GUI (GUIDE)
+test.m                          scratch script (Link/SerialLink experiments)
+UNIMATE/puma560/                ARTE STL link meshes + PUMA 560 parameters / IK
+gif_puma_560/  gif_puma_560_3d/ rendered animations (2D and 3D)
+gif_robot_gui/                  rendered RRR animations
+images/                         per-frame PNGs the GUIs write for the GIFs
+robot.pdf / robot (1).pdf       reference notes
+```
+
+## Author
+
+* **Leonardo Ward** &mdash; [GitHub](https://github.com/leonardoward)
